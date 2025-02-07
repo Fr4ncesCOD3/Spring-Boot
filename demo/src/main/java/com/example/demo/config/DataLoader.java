@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+// Import delle dipendenze Spring necessarie
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -13,10 +14,16 @@ import com.example.demo.repository.EdificioRepository;
 import com.example.demo.repository.PostazioneRepository;
 import com.example.demo.repository.UtenteRepository;
 
+/**
+ * Classe responsabile del caricamento dei dati iniziali nel database.
+ * Viene eseguita all'avvio dell'applicazione grazie all'implementazione di CommandLineRunner.
+ * L'annotazione @Order(1) garantisce che venga eseguita per prima.
+ */
 @Component
 @Order(1)
 public class DataLoader implements CommandLineRunner {
 
+    // Injection dei repository necessari per l'accesso al database
     @Autowired
     private EdificioRepository edificioRepository;
     
@@ -26,6 +33,10 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private UtenteRepository utenteRepository;
 
+    /**
+     * Metodo eseguito all'avvio dell'applicazione.
+     * Verifica se il database è vuoto e in tal caso lo popola con i dati iniziali.
+     */
     @Override
     public void run(String... args) {
         try {
@@ -40,8 +51,12 @@ public class DataLoader implements CommandLineRunner {
         }
     }
 
+    /**
+     * Metodo che inizializza il database con i dati di esempio.
+     * Crea edifici, postazioni e utenti di test.
+     */
     private void initializeData() {
-        // EDIFICI
+        // Creazione degli edifici nelle principali città italiane
         Edificio edificioMilano1 = createEdificio("Grattacielo Milano", "Via Pirelli 1", "Milano");
         Edificio edificioMilano2 = createEdificio("Milano Centro", "Piazza Duomo 1", "Milano");
         Edificio edificioRoma1 = createEdificio("Roma EUR", "Viale Europa 190", "Roma");
@@ -49,7 +64,7 @@ public class DataLoader implements CommandLineRunner {
         Edificio edificioNapoli = createEdificio("Napoli Business", "Via Toledo 256", "Napoli");
         Edificio edificioTorino = createEdificio("Torino Innovation", "Corso Vittorio 45", "Torino");
         
-        // POSTAZIONI
+        // Creazione delle postazioni per ogni edificio
         // Milano - Grattacielo
         createPostazione("MI001", "Executive Office", TipoPostazione.PRIVATO, 1, edificioMilano1);
         createPostazione("MI002", "Open Space Piano 10", TipoPostazione.OPENSPACE, 15, edificioMilano1);
@@ -78,7 +93,7 @@ public class DataLoader implements CommandLineRunner {
         createPostazione("TO002", "Innovation Lab", TipoPostazione.OPENSPACE, 40, edificioTorino);
         createPostazione("TO003", "Meeting Room Future", TipoPostazione.SALA_RIUNIONI, 30, edificioTorino);
 
-        // UTENTI
+        // Creazione degli utenti di esempio
         createUtente("mario.rossi", "Mario Rossi", "mario.rossi@example.com");
         createUtente("laura.bianchi", "Laura Bianchi", "laura.bianchi@example.com");
         createUtente("giuseppe.verdi", "Giuseppe Verdi", "giuseppe.verdi@example.com");
@@ -91,6 +106,13 @@ public class DataLoader implements CommandLineRunner {
         createUtente("valentina.greco", "Valentina Greco", "valentina.greco@example.com");
     }
 
+    /**
+     * Crea e salva un nuovo edificio nel database.
+     * @param nome Nome dell'edificio
+     * @param indirizzo Indirizzo dell'edificio
+     * @param citta Città dove si trova l'edificio
+     * @return L'edificio creato e salvato
+     */
     private Edificio createEdificio(String nome, String indirizzo, String citta) {
         Edificio edificio = new Edificio();
         edificio.setNome(nome);
@@ -99,6 +121,14 @@ public class DataLoader implements CommandLineRunner {
         return edificioRepository.save(edificio);
     }
 
+    /**
+     * Crea e salva una nuova postazione nel database.
+     * @param codice Codice identificativo della postazione
+     * @param descrizione Descrizione della postazione
+     * @param tipo Tipo della postazione (PRIVATO, OPENSPACE, SALA_RIUNIONI)
+     * @param maxOccupanti Numero massimo di occupanti
+     * @param edificio Edificio a cui appartiene la postazione
+     */
     private void createPostazione(String codice, String descrizione, TipoPostazione tipo, 
                                 int maxOccupanti, Edificio edificio) {
         Postazione postazione = new Postazione();
@@ -110,6 +140,12 @@ public class DataLoader implements CommandLineRunner {
         postazioneRepository.save(postazione);
     }
 
+    /**
+     * Crea e salva un nuovo utente nel database se non esiste già un utente con la stessa email.
+     * @param username Username dell'utente
+     * @param nomeCompleto Nome completo dell'utente
+     * @param email Email dell'utente
+     */
     private void createUtente(String username, String nomeCompleto, String email) {
         if (!utenteRepository.existsByEmail(email)) {
             Utente utente = new Utente();

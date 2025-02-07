@@ -1,5 +1,6 @@
 package com.example.demo.cli;
 
+// Import delle librerie necessarie
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -17,22 +18,33 @@ import com.example.demo.model.Utente;
 import com.example.demo.service.PrenotazioneService;
 import com.example.demo.service.UtenteService;
 
+/**
+ * Classe che implementa l'interfaccia a riga di comando dell'applicazione.
+ * Gestisce l'interazione con l'utente attraverso un menu testuale.
+ */
 @Component
 @Order(2)
 public class CommandLineInterface implements CommandLineRunner {
 
+    // Costanti per la formattazione dell'output
     private static final String LINE_SEPARATOR = "\n" + "=".repeat(50) + "\n";
     private static final String DATE_FORMAT = "YYYY-MM-DD";
     
+    // Injection dei servizi necessari
     @Autowired
     private PrenotazioneService prenotazioneService;
     @Autowired
     private UtenteService utenteService;
     
+    // Variabili di istanza per gestire l'input e lo stato dell'utente
     private Scanner scanner = new Scanner(System.in);
-    private String currentUser = null;
-    private boolean isAdmin = false;
+    private String currentUser = null; // Username dell'utente corrente
+    private boolean isAdmin = false;   // Flag per i privilegi di amministratore
 
+    /**
+     * Metodo principale che avvia l'interfaccia CLI.
+     * Gestisce il loop principale del programma e il menu di navigazione.
+     */
     @Override
     public void run(String... args) {
         while (true) {
@@ -40,11 +52,13 @@ public class CommandLineInterface implements CommandLineRunner {
             printWelcome();
             
             if (currentUser == null) {
+                // Se nessun utente è loggato, richiedi autenticazione
                 if (!autenticazione()) {
                     System.out.println("\nGrazie per aver utilizzato il nostro servizio!");
                     break;
                 }
             } else {
+                // Se l'utente è loggato, mostra il menu principale
                 try {
                     printMenu();
                     int scelta = getValidChoice(0, isAdmin ? 7 : 4);
@@ -80,6 +94,11 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Gestisce il processo di autenticazione dell'utente.
+     * Permette di scegliere tra accesso come amministratore o utente normale.
+     * @return true se l'autenticazione ha successo, false altrimenti
+     */
     private boolean autenticazione() {
         System.out.println("\nSeleziona il tipo di accesso:");
         System.out.println("1. Amministratore");
@@ -99,6 +118,10 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Gestisce l'autenticazione dell'amministratore.
+     * @return true se l'autenticazione ha successo, false altrimenti
+     */
     private boolean autenticazioneAdmin() {
         System.out.println("\n=== Accesso Amministratore ===");
         System.out.print("Password: ");
@@ -115,6 +138,11 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Gestisce l'autenticazione dell'utente normale.
+     * Se l'utente non esiste, offre la possibilità di registrarsi.
+     * @return true se l'autenticazione ha successo, false altrimenti
+     */
     private boolean autenticazioneUtente() {
         System.out.println("\n=== Accesso Utente ===");
         System.out.print("Username (nome.cognome): ");
@@ -139,6 +167,10 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Gestisce la registrazione di un nuovo utente.
+     * @param username Username scelto dall'utente
+     */
     private void registrazioneUtente(String username) {
         System.out.println("\n=== Registrazione Nuovo Utente ===");
         System.out.print("Nome completo: ");
@@ -155,6 +187,10 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Stampa il menu principale dell'applicazione.
+     * Il menu varia in base ai privilegi dell'utente (admin/utente normale).
+     */
     private void printMenu() {
         System.out.println("\nSeleziona un'operazione:");
         System.out.println("1. Cerca postazioni disponibili");
@@ -170,17 +206,29 @@ public class CommandLineInterface implements CommandLineRunner {
         System.out.print("\nScelta: ");
     }
 
+    /**
+     * Pulisce lo schermo del terminale.
+     */
     private void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
 
+    /**
+     * Stampa il messaggio di benvenuto.
+     */
     private void printWelcome() {
         System.out.println(LINE_SEPARATOR);
         System.out.println("   Benvenuto nel Sistema di Gestione Prenotazioni   ");
         System.out.println(LINE_SEPARATOR);
     }
 
+    /**
+     * Ottiene una scelta valida dall'utente all'interno di un range specificato.
+     * @param min Valore minimo accettabile
+     * @param max Valore massimo accettabile
+     * @return La scelta valida dell'utente
+     */
     private int getValidChoice(int min, int max) {
         while (true) {
             try {
@@ -194,6 +242,11 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Ottiene una data valida dall'utente.
+     * La data deve essere nel formato corretto e non può essere nel passato.
+     * @return La data valida inserita dall'utente
+     */
     private LocalDate getValidDate() {
         while (true) {
             try {
@@ -210,6 +263,9 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Permette la ricerca di postazioni disponibili in base a criteri specifici.
+     */
     private void cercaPostazioni() {
         System.out.println("\n=== Ricerca Postazioni ===");
         
@@ -243,6 +299,10 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Ottiene un tipo di postazione valido dall'utente.
+     * @return Il tipo di postazione selezionato
+     */
     private TipoPostazione getTipoPostazione() {
         while (true) {
             try {
@@ -253,6 +313,9 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Gestisce il processo di prenotazione di una postazione.
+     */
     private void effettuaPrenotazione() {
         try {
             System.out.println("\n=== Nuova Prenotazione ===");
@@ -276,6 +339,9 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Visualizza le prenotazioni di un utente specifico.
+     */
     private void visualizzaPrenotazioni() {
         System.out.println("\n=== Le tue Prenotazioni ===");
         System.out.println("Username: ");
@@ -299,6 +365,10 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Mostra le informazioni di riferimento del sistema.
+     * Include lista utenti, postazioni disponibili e tipologie.
+     */
     private void mostraInformazioniRiferimento() {
         System.out.println("\n=== INFORMAZIONI DI RIFERIMENTO ===");
         
@@ -351,7 +421,9 @@ public class CommandLineInterface implements CommandLineRunner {
         System.out.println("- SALA_RIUNIONI");
     }
 
-    // Metodi per l'amministratore
+    /**
+     * Menu di gestione utenti per amministratori.
+     */
     private void gestisciUtenti() {
         System.out.println("\n=== Gestione Utenti ===");
         System.out.println("1. Lista utenti");
@@ -365,6 +437,9 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Menu di gestione prenotazioni per amministratori.
+     */
     private void gestisciPrenotazioni() {
         while (true) {
             System.out.println("\n=== Gestione Prenotazioni ===");
@@ -388,6 +463,9 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Menu di gestione postazioni per amministratori.
+     */
     private void gestisciPostazioni() {
         System.out.println("\n=== Gestione Postazioni ===");
         System.out.println("1. Lista postazioni");
@@ -403,7 +481,9 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
-    // Implementazione dei metodi di gestione admin
+    /**
+     * Mostra la lista di tutti gli utenti registrati.
+     */
     private void mostraListaUtenti() {
         System.out.println("\n=== Lista Utenti ===");
         List<Utente> utenti = utenteService.getAllUtenti();
@@ -421,6 +501,9 @@ public class CommandLineInterface implements CommandLineRunner {
         ));
     }
 
+    /**
+     * Permette l'eliminazione di un utente dal sistema.
+     */
     private void eliminaUtente() {
         System.out.println("\n=== Elimina Utente ===");
         System.out.print("Inserisci username da eliminare: ");
@@ -434,6 +517,9 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Mostra la lista di tutte le prenotazioni nel sistema.
+     */
     private void mostraTuttePrenotazioni() {
         System.out.println("\n=== Lista Prenotazioni ===");
         List<Prenotazione> prenotazioni = prenotazioneService.getAllPrenotazioni(currentUser);
@@ -453,6 +539,9 @@ public class CommandLineInterface implements CommandLineRunner {
         ));
     }
 
+    /**
+     * Permette l'eliminazione di una prenotazione dal sistema.
+     */
     private void eliminaPrenotazione() {
         System.out.println("\n=== Elimina Prenotazione ===");
         System.out.print("Inserisci ID prenotazione da eliminare: ");
@@ -467,6 +556,9 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Mostra la lista di tutte le postazioni nel sistema.
+     */
     private void mostraListaPostazioni() {
         System.out.println("\n=== Lista Postazioni ===");
         List<Postazione> postazioni = prenotazioneService.getAllPostazioni();
@@ -485,6 +577,9 @@ public class CommandLineInterface implements CommandLineRunner {
         ));
     }
 
+    /**
+     * Permette l'aggiunta di una nuova postazione nel sistema.
+     */
     private void aggiungiPostazione() {
         System.out.println("\n=== Aggiungi Postazione ===");
         try {
@@ -510,6 +605,9 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Permette l'eliminazione di una postazione dal sistema.
+     */
     private void eliminaPostazione() {
         System.out.println("\n=== Elimina Postazione ===");
         System.out.print("Inserisci codice postazione da eliminare: ");
@@ -523,6 +621,9 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Permette la modifica di una prenotazione esistente.
+     */
     private void modificaPrenotazione() {
         System.out.println("\n=== Modifica Prenotazione ===");
         mostraTuttePrenotazioni();
@@ -562,6 +663,9 @@ public class CommandLineInterface implements CommandLineRunner {
         }
     }
 
+    /**
+     * Effettua il logout dell'utente corrente.
+     */
     private void logout() {
         currentUser = null;
         isAdmin = false;
